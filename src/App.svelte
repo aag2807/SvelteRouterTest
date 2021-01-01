@@ -5,37 +5,65 @@
 	import Cart from "./Cart.svelte";
 	import Ship from "./Ship.svelte";
 	import Shop from "./Shop.svelte";
+	import NotFound from "./NotFound.svelte";
 
-	const pageMap = {
-		cart: Cart,
-		ship: Ship,
-		shop: Shop,
+	let component;
+
+	const hashMap = {
+		"#cart": Cart,
+		"#ship": Ship,
+		"#shop": Shop,
 	};
-	let pageName = "shop";
+
+	function hashChange() {
+		component = hashMap[location.hash] || NotFound;
+	}
 </script>
 
 <style>
+	:root {
+		--space: 0.5rem;
+	}
+
+	a {
+		background-color: white;
+		border-radius: var(--space);
+		margin-right: var(--space);
+		padding: var(--space);
+		text-decoration: none;
+	}
+
+	a.active {
+		background-color: yellow;
+	}
+
+	.icon {
+		padding-bottom: 6px;
+	}
+
 	main {
-		padding: 1em;
+		padding: var(--space);
 	}
 
 	nav {
 		display: flex;
 		align-items: center;
 		background-color: cornflowerblue;
-		padding: 10px;
+		padding: var(--space);
 	}
 </style>
 
+<svelte:window on:hashChange={hashChange} />
 
 <nav>
-	<NavButton bind:pageName name='shop'>Shop</NavButton>
-	<NavButton bind:pageName name='cart'>
-		&#x1F6D2; {$cartStore.length}
-	</NavButton>
-	<NavButton bind:pageName name='ship'>Ship</NavButton>
+	<a href="/#shop" class:active={component === Shop}>Shop</a>
+	<a href="/#cart" class:active={component === Cart} class="icon">
+		&#x1F6D2;
+		{$cartStore.length}
+	</a>
+	<a href="/#ship" class:active={component === Ship}>Ship</a>
 </nav>
 
 <main>
-	<svelte:component this={pageMap[pageName]} />
+	<svelte:component this={component} />
 </main>
